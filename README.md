@@ -1,5 +1,5 @@
 # MDSANet_Vietnamese
-MDSANet for Vietnamese
+Use MDSANet for Vietnamese Image Captions
 
 # Multi-Branch Distance-Sensitive Self-Attention Network for Image Captioning
 This repository contains the reference code for the paper **"Multi-Branch Distance-Sensitive Self-Attention Network for Image Captioning"**.
