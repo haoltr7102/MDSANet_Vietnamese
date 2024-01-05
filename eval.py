@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     # Model and dataloaders
     encoder = TransformerEncoder(3, 0, attention_module=ScaledDotProductAttention)
-    decoder = TransformerDecoderLayer(len(text_field.vocab), 54, 3, text_field.vocab.stoi['<pad>'])
+    decoder = TransformerDecoderLayer(len(text_field.vocab), 130, 3, text_field.vocab.stoi['<pad>'])
     model = Transformer(text_field.vocab.stoi['<bos>'], encoder, decoder).to(device)
 
     data = torch.load(args.model_path)

@@ -1,7 +1,8 @@
 import os
 import numpy as np
 import itertools
-import collections
+import collections as c
+import collections.abc as collections
 import torch
 from .example import Example
 from .utils import nostdout
@@ -95,8 +96,9 @@ class DictionaryDataset(Dataset):
         for field in key_fields:
             assert (field in fields)
 
-        dictionary = collections.defaultdict(list)
+        dictionary = c.defaultdict(list)
         key_fields = {k: fields[k] for k in key_fields}
+        #import pdb; pdb.set_trace()
         value_fields = {k: fields[k] for k in fields.keys() if k not in key_fields}
         key_examples = []
         key_dict = dict()
@@ -179,45 +181,45 @@ class PairedDataset(Dataset):
 
 
 class COCO(PairedDataset):
-    def __init__(self, image_field, text_field, img_root, ann_root, id_root=None, use_restval=True,
+    def __init__(self, image_field, text_field, img_root, ann_root, id_root=None, use_restval=False,
                  cut_validation=False):
         roots = {}
         roots['train'] = {
-            'img': os.path.join(img_root, 'train2014'),
-            'cap': os.path.join(ann_root, 'captions_train2014.json')
+            'img': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/train'),
+            'cap': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/uit-openviic-train.json')
         }
         roots['val'] = {
-            'img': os.path.join(img_root, 'val2014'),
-            'cap': os.path.join(ann_root, 'captions_val2014.json')
+            'img': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/val'),
+            'cap': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/uit-openviic-dev.json')
         }
         roots['test'] = {
-            'img': os.path.join(img_root, 'val2014'),
-            'cap': os.path.join(ann_root, 'captions_val2014.json')
+            'img': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/test'),
+            'cap': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/uit-openviic-test.json')
         }
         roots['trainrestval'] = {
             'img': (roots['train']['img'], roots['val']['img']),
             'cap': (roots['train']['cap'], roots['val']['cap'])
         }
 
-        if id_root is not None:
-            ids = {}
-            ids['train'] = np.load(os.path.join(id_root, 'coco_train_ids.npy'))
-            ids['val'] = np.load(os.path.join(id_root, 'coco_dev_ids.npy'))
-            if cut_validation:
-                ids['val'] = ids['val'][:5000]
-            ids['test'] = np.load(os.path.join(id_root, 'coco_test_ids.npy'))
-            ids['trainrestval'] = (
-                ids['train'],
-                np.load(os.path.join(id_root, 'coco_restval_ids.npy')))
+        # if id_root is not None:
+        #     ids = {}
+        #     ids['train'] = np.load(os.path.join(id_root, 'coco_train_ids.npy'))
+        #     ids['val'] = np.load(os.path.join(id_root, 'coco_dev_ids.npy'))
+        #     if cut_validation:
+        #         ids['val'] = ids['val'][:5000]
+        #     ids['test'] = np.load(os.path.join(id_root, 'coco_dev_ids.npy'))
+        #     ids['trainrestval'] = (
+        #         ids['train'],
+        #         np.load(os.path.join(id_root, 'coco_dev_ids.npy')))
 
-            if use_restval:
-                roots['train'] = roots['trainrestval']
-                ids['train'] = ids['trainrestval']
-        else:
-            ids = None
+        #     if use_restval:
+        #         roots['train'] = roots['trainrestval']
+        #         ids['train'] = ids['trainrestval']
+        # else:
+        #     ids = None
 
         with nostdout():
-            self.train_examples, self.val_examples, self.test_examples = self.get_samples(roots, ids)
+            self.train_examples, self.val_examples, self.test_examples = self.get_samples(roots, None)
         examples = self.train_examples + self.val_examples + self.test_examples
         super(COCO, self).__init__(examples, {'image': image_field, 'text': text_field})
 
@@ -228,22 +230,25 @@ class COCO(PairedDataset):
         test_split = PairedDataset(self.test_examples, self.fields)
         return train_split, val_split, test_split
 
-    @classmethod
+    #@classmethod
     def get_samples(cls, roots, ids_dataset=None):
         train_samples = []
         val_samples = []
         test_samples = []
 
         for split in ['train', 'val', 'test']:
+            print(split)
             if isinstance(roots[split]['cap'], tuple):
                 coco_dataset = (pyCOCO(roots[split]['cap'][0]), pyCOCO(roots[split]['cap'][1]))
                 root = roots[split]['img']
             else:
+                with open('test.txt', 'w') as f:
+                    f.write(str(roots[split]['cap']))
                 coco_dataset = (pyCOCO(roots[split]['cap']),)
                 root = (roots[split]['img'],)
 
             if ids_dataset is None:
-                ids = list(coco_dataset.anns.keys())
+                ids = list(coco_dataset[0].anns.keys())
             else:
                 ids = ids_dataset[split]
 
@@ -262,9 +267,16 @@ class COCO(PairedDataset):
                     img_root = root[1]
 
                 ann_id = ids[index]
+
                 caption = coco.anns[ann_id]['caption']
                 img_id = coco.anns[ann_id]['image_id']
+
+                #import pdb; pdb.set_trace()
+
+                #filename = coco.loadImgs(img_id)[0]['file_name']
                 filename = coco.loadImgs(img_id)[0]['file_name']
+                
+                # import pdb; pdb.set_trace()
 
                 example = Example.fromdict({'image': os.path.join(img_root, filename), 'text': caption})
 
@@ -276,4 +288,3 @@ class COCO(PairedDataset):
                     test_samples.append(example)
 
         return train_samples, val_samples, test_samples
-

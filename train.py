@@ -193,7 +193,7 @@ if __name__ == '__main__':
     # Model and dataloaders
     # TransformerEncoder, TransformerDecoderLayer, ScaledDotProductAttention
     encoder = TransformerEncoder(3, 0, M=args.M, p=args.p, attention_module=ScaledDotProductAttention)
-    decoder = TransformerDecoderLayer(len(text_field.vocab), 54, 3, text_field.vocab.stoi['<pad>'])
+    decoder = TransformerDecoderLayer(len(text_field.vocab), 130, 3, text_field.vocab.stoi['<pad>'])
     model = Transformer(text_field.vocab.stoi['<bos>'], encoder, decoder).to(device)
 
     total = sum([param.nelement() for param in model.parameters() if param.requires_grad])
@@ -239,9 +239,9 @@ if __name__ == '__main__':
 
     if args.resume_last or args.resume_best:
         if args.resume_last:
-            fname = 'saved_transformer_models/%s_last.pth' % args.exp_name
+            fname = '/content/drive/MyDrive/saved_transformer_models/UIT_OpenViIC/%s_last.pth' % args.exp_name
         else:
-            fname = 'saved_transformer_models/%s_best.pth' % args.exp_name
+            fname = '/content/drive/MyDrive/saved_transformer_models/UIT_OpenViIC/%s_best.pth' % args.exp_name
 
         if os.path.exists(fname):
             data = torch.load(fname)
@@ -261,7 +261,7 @@ if __name__ == '__main__':
             print('patience:', data['patience'])
 
     print("Training starts")
-    for e in range(start_epoch, start_epoch + 100):
+    for e in range(start_epoch, start_epoch + 50):
         dataloader_train = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=args.workers,
                                       drop_last=True)
         dataloader_val = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
@@ -295,7 +295,8 @@ if __name__ == '__main__':
         writer.add_scalar('data/val_bleu4', scores['BLEU'][3], e)
         writer.add_scalar('data/val_meteor', scores['METEOR'], e)
         writer.add_scalar('data/val_rouge', scores['ROUGE'], e)
-
+        
+        '''
         # Test scores
         scores = evaluate_metrics(model, dict_dataloader_test, text_field)
         print("Test scores", scores)
@@ -305,7 +306,7 @@ if __name__ == '__main__':
         writer.add_scalar('data/test_bleu4', scores['BLEU'][3], e)
         writer.add_scalar('data/test_meteor', scores['METEOR'], e)
         writer.add_scalar('data/test_rouge', scores['ROUGE'], e)
-
+        '''
         # Prepare for next epoch
         best = False
         if val_cider >= best_cider:
@@ -316,14 +317,15 @@ if __name__ == '__main__':
             patience += 1
 
         switch_to_rl = False
-        if not use_rl and (patience >= 3 or e == args.rl_at):
+        #if not use_rl and (patience >= 3 or e == args.rl_at):
+        if e >=20:
             use_rl = True
             switch_to_rl = True
             patience = 0
             print("Switching to RL")
         
         if switch_to_rl and not best:
-            data = torch.load('saved_transformer_models/%s_best.pth' % args.exp_name)
+            data = torch.load('/content/drive/MyDrive/saved_transformer_models/UIT_OpenViIC/%s_best.pth' % args.exp_name)
             torch.set_rng_state(data['torch_rng_state'])
             torch.cuda.set_rng_state(data['cuda_rng_state'])
             np.random.set_state(data['numpy_rng_state'])
@@ -350,7 +352,7 @@ if __name__ == '__main__':
             'patience': patience,
             'best_cider': best_cider,
             'use_rl': use_rl,
-        }, 'saved_transformer_models/%s_last.pth' % args.exp_name)
+        }, '/content/drive/MyDrive/saved_transformer_models/UIT_OpenViIC/%s_last.pth' % args.exp_name)
 
         if best:
-            copyfile('saved_transformer_models/%s_last.pth' % args.exp_name, 'saved_transformer_models/%s_best.pth' % args.exp_name)
+            copyfile('/content/drive/MyDrive/saved_transformer_models/UIT_OpenViIC/%s_last.pth' % args.exp_name, '/content/drive/MyDrive/saved_transformer_models/UIT_OpenViIC/%s_best.pth' % args.exp_name)
