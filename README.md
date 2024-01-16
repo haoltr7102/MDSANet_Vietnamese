@@ -1,3 +1,6 @@
+# MDSANet_Vietnamese
+Use [MDSANet](https://github.com/Young499/image-captioning-MDSANet) for Image Captions Vietnamese 
+
 # Multi-Branch Distance-Sensitive Self-Attention Network for Image Captioning
 This repository contains the reference code for the paper **"Multi-Branch Distance-Sensitive Self-Attention Network for Image Captioning"**.
 ![](./images/arch.png)
@@ -13,6 +16,9 @@ Then download spacy data by executing the following command:
 ```
 python -m spacy download en
 ```
+***
+## Dataset
+
 ***
 ## Training
 Run `python train.py` using the following arguments:
