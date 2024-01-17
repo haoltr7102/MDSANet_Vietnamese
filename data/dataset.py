@@ -193,8 +193,8 @@ class COCO(PairedDataset):
             'cap': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/uit-openviic-dev.json')
         }
         roots['test'] = {
-            'img': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/test'),
-            'cap': os.path.join('/content/drive/MyDrive/datasets/OpenViIC/uit-openviic-test.json')
+            'img': os.path.join('./../dataset/UIT-ViIC/uitviic_captions_test2017'),
+            'cap': os.path.join('./../dataset/UIT-ViIC/uitviic_captions_test2017.json')
         }
         roots['trainrestval'] = {
             'img': (roots['train']['img'], roots['val']['img']),

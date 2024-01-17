@@ -103,7 +103,7 @@ class ImageDetectionsField(RawField):
 
         super(ImageDetectionsField, self).__init__(preprocessing, postprocessing)
 
-    def preprocess(self, x, avoid_precomp=False):
+    def preprocess(self, x, avoid_precomp=False): #colab
         image_id = str(x.split('/')[-1].split('.')[0])
         try:
             
@@ -123,7 +123,6 @@ class ImageDetectionsField(RawField):
             precomp_data = precomp_data[:self.max_detections]
 
         return precomp_data.astype(np.float32)
-
 
 class TextField(RawField):
     vocab_cls = Vocab

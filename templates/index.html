@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinh câu mô tả tiếng Việt cho ảnh</title>
+    <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="/static/styles.css">
+
+    <style>
+        .header-container {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="header-container">
+        <img src="/static/banner_uit.png" alt="Banner UIT" style="width: 300px; height: auto; margin-right: 250px; " >
+
+        <h1>Sinh câu mô tả tiếng Việt cho ảnh</h1>
+    </div>
+
+    <!-- Add a dropdown menu for selecting the theme -->
+    <h2> 
+        <label for="themeSelect">Chọn chủ đề:</label>
+        <select id="themeSelect">
+            <option value="uit_viic">Các môn thể thao chơi bóng</option>
+            <option value="viecap4h">Y tế</option>
+            <option value="uit_openviic">Bối cảnh Việt Nam</option>
+        </select>
+    
+        <form id="imageForm" action="/generate_caption" method="post" enctype="multipart/form-data">
+            <label2 for="imageInput">Chọn file: </label2>
+            <input type="file" name="image" accept="image/*" id="imageInput">
+            <input type="submit" value="Tạo chú thích">
+            <button type="button" id="refreshButton">Làm mới</button>
+        </form>
+    </h2>
+    
+    <div id="outputDisplay">
+        <!-- Placeholder for displaying the processed image -->
+        <img id="generateCaption" src="#" alt="Tạo chú thích">
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Function to display the selected image
+            function displaySelectedImage(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imageDisplay').html('<img id="selectedImage" src="' + e.target.result + '" alt="Selected Image">');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Listen for changes in the file input
+            $('#imageInput').on('change', function() {
+                // Get the selected file
+                var file = $(this).prop('files')[0];
+                displaySelectedImage(file);
+            });
+
+            // Listen for form submission
+            $('#imageForm').submit(function(event) {
+                // Prevent the default form submission
+                event.preventDefault();
+
+                // Create a FormData object to send the file
+                var formData = new FormData(this);
+
+                // Add the selected theme to the form data
+                formData.append('theme', $('#themeSelect').val());
+
+                // Make an AJAX request to process the image
+                $.ajax({
+                    url: '/generate_caption',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Display the processed image
+                        $('#generateCaption').attr('src', response.img_path);
+                    },
+                    error: function(error) {
+                        console.log('Error:', error);
+                    }
+                });
+            });
+            // Listen for button click - Refresh
+            $('#refreshButton').on('click', function() {
+                location.reload(); // Reload the page
+            });
+        });
+    </script>
+</body>
+</html>

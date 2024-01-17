@@ -1,0 +1,79 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f3efef;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    color: #0e50b3;
+}
+
+label {
+    /* display: block; */
+    text-align: center;
+    padding: 8px;
+}
+
+h2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #75d1bd;
+}
+
+#themeSelect {
+    font-size: 14px;
+    text-align: center;
+    padding: 8px;
+    margin-right: 20px;
+
+}
+
+#themeSelect option {
+    text-align: center;
+    padding: 8px;
+}
+
+#imageInput {
+    background-color: #ffffff;
+    font-size: 14px;
+    display: inline-block; 
+    padding: 8px;
+}
+
+#imageForm input[type="submit"],
+
+#imageForm {
+    text-align: center;
+    margin: 20px 0;
+}
+
+#generateCaption {
+    max-width: 100%;
+    height: 500px;
+    display: block;
+    margin: 20px auto;
+    padding: 10px;
+    border: 1;
+}
+
+#outputDisplay {
+    text-align: center;
+}
+
+#refreshButton {
+    background-color: #949e91;
+    font-size: 14px;
+    color: #fff;
+    padding: 8px 16px;
+    border: 1;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+#refreshButton:hover {
+    background-color: #22e940;
+}
